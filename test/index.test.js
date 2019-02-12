@@ -1,6 +1,4 @@
-/**
- * Module tests
- */
+'use strict';
 
 const assert = require('assert');
 const Router = require('..');

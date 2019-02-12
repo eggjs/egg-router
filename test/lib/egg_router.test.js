@@ -5,7 +5,7 @@ const assert = require('assert');
 const is = require('is-type-of');
 
 describe('test/lib/egg_router.test.js', () => {
-  it('creates new router with egg app', function () {
+  it('creates new router with egg app', function() {
     const app = { controller: {} };
     const router = new EggRouter({}, app);
     assert(router);
@@ -17,9 +17,9 @@ describe('test/lib/egg_router.test.js', () => {
   it('should app.verb(url, controller) work', () => {
     const app = {
       controller: {
-        async foo() {},
+        async foo() { return; },
         hello: {
-          * world() {},
+          * world() { return; },
         },
       },
     };
@@ -39,9 +39,9 @@ describe('test/lib/egg_router.test.js', () => {
   it('should app.verb(name, url, controller) work', () => {
     const app = {
       controller: {
-        async foo() { },
+        async foo() { return; },
         hello: {
-          * world() { },
+          * world() { return; },
         },
       },
     };
@@ -63,9 +63,9 @@ describe('test/lib/egg_router.test.js', () => {
   it('should app.verb(name, url, controllerString) work', () => {
     const app = {
       controller: {
-        async foo() { },
+        async foo() { return; },
         hello: {
-          * world() { },
+          * world() { return; },
         },
       },
     };
@@ -87,16 +87,16 @@ describe('test/lib/egg_router.test.js', () => {
   it('should app.verb() throw if not found controller', () => {
     const app = {
       controller: {
-        async foo() { },
+        async foo() { return; },
         hello: {
-          * world() { },
+          * world() { return; },
         },
       },
     };
 
     const router = new EggRouter({}, app);
     assert.throws(() => {
-      router.get('foo', '/foo', 'foobar')
+      router.get('foo', '/foo', 'foobar');
     }, /controller 'foobar' not exists/);
 
     assert.throws(() => {
@@ -107,15 +107,15 @@ describe('test/lib/egg_router.test.js', () => {
   it('should app.verb(name, url, [middlewares], controllerString) work', () => {
     const app = {
       controller: {
-        async foo() { },
+        async foo() { return; },
         hello: {
-          * world() { },
+          * world() { return; },
         },
       },
     };
 
-    const generatorMiddleware = function* () {};
-    const asyncMiddleware = async function() {};
+    const generatorMiddleware = function* () { return; };
+    const asyncMiddleware = async function() { return; };
     const commonMiddleware = function() {};
 
     const router = new EggRouter({}, app);
@@ -142,16 +142,16 @@ describe('test/lib/egg_router.test.js', () => {
     const app = {
       controller: {
         post: {
-          async index() { },
-          async show() { },
-          async create() { },
-          async update() { },
-          async new() {},
+          async index() { return; },
+          async show() { return; },
+          async create() { return; },
+          async update() { return; },
+          async new() { return; },
         },
       },
     };
 
-    const asyncMiddleware = async function () { };
+    const asyncMiddleware = async function() { return; };
 
     const router = new EggRouter({}, app);
     router.resources('/post', asyncMiddleware, app.controller.post);
@@ -167,9 +167,9 @@ describe('test/lib/egg_router.test.js', () => {
   it('should router.url work', () => {
     const app = {
       controller: {
-        async foo() { },
+        async foo() { return; },
         hello: {
-          * world() { },
+          * world() { return; },
         },
       },
     };
@@ -177,12 +177,12 @@ describe('test/lib/egg_router.test.js', () => {
     router.get('post', '/post/:id', app.controller.foo);
     router.get('hello', '/hello/world', app.controller.hello.world);
 
-    assert(router.url('post', { id: 1, foo: [1, 2], bar: 'bar' }) === '/post/1?foo=1&foo=2&bar=bar');
-    assert(router.url('post', { foo: [1, 2], bar: 'bar' }) === '/post/:id?foo=1&foo=2&bar=bar');
+    assert(router.url('post', { id: 1, foo: [ 1, 2 ], bar: 'bar' }) === '/post/1?foo=1&foo=2&bar=bar');
+    assert(router.url('post', { foo: [ 1, 2 ], bar: 'bar' }) === '/post/:id?foo=1&foo=2&bar=bar');
     assert(router.url('fooo') === '');
     assert(router.url('hello') === '/hello/world');
 
-    assert(router.pathFor('post', { id: 1, foo: [1, 2], bar: 'bar' }) === '/post/1?foo=1&foo=2&bar=bar');
+    assert(router.pathFor('post', { id: 1, foo: [ 1, 2 ], bar: 'bar' }) === '/post/1?foo=1&foo=2&bar=bar');
     assert(router.pathFor('fooo') === '');
     assert(router.pathFor('hello') === '/hello/world');
   });

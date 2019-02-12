@@ -52,7 +52,9 @@ describe('test/lib/utils.test.js', () => {
     });
 
     it('should work with generator function', () => {
-      const res = utils.middleware(function* () { });
+      const res = utils.middleware(function* () {
+        return;
+      });
       assert(!is.generatorFunction(res));
     });
   });

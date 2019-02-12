@@ -1,5 +1,6 @@
 {
   "name": "@eggjs/router",
+  "version": "1.2.0",
   "description": "Router middleware for egg/koa. Provides RESTful resource routing.",
   "repository": {
     "type": "git",
@@ -10,7 +11,6 @@
     "index.js"
   ],
   "author": "eggjs",
-  "version": "1.2.0",
   "keywords": [
     "koa",
     "middleware",
@@ -33,18 +33,22 @@
   "devDependencies": {
     "egg-bin": "^4.10.0",
     "egg-ci": "^1.11.0",
+    "eslint": "^5.13.0",
+    "eslint-config-egg": "^7.1.0",
     "expect.js": "^0.3.1",
-    "koa": "2.2.0",
+    "koa": "^2.7.0",
     "mocha": "^2.0.1",
     "should": "^6.0.3",
     "supertest": "^1.0.1"
   },
   "scripts": {
-    "test": "egg-bin test",
-    "ci": "egg-bin cov"
+    "test-local": "egg-bin test",
+    "test": "npm run lint && egg-bin test",
+    "ci": "npm run lint && egg-bin cov",
+    "lint": "eslint ."
   },
   "ci": {
-    "version": "8, 10"
+    "version": "8, 10, 11"
   },
   "engines": {
     "node": ">= 8"
