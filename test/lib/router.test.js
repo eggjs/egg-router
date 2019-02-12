@@ -561,6 +561,27 @@ describe('test/lib/router.test.js', function() {
         });
     });
 
+    it('responds ignore allowedMethods when status is already set', function(done) {
+      const app = new Koa();
+      const router = new Router();
+      router.get('/users', function() {});
+      router.put('/users', function() {});
+      router.post('/events', function() {});
+      app.use((ctx, next) => {
+        ctx.status = 200;
+        next();
+      });
+      app.use(router.routes());
+      app.use(router.allowedMethods());
+      request(http.createServer(app.callback()))
+        .post('/users')
+        .expect(200)
+        .end(function(err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+
     it('responds with 405 Method Not Allowed using the "throw" option', function(done) {
       const app = new Koa();
       const router = new Router();
@@ -1140,6 +1161,9 @@ describe('test/lib/router.test.js', function() {
       url.should.equal('/programming/how%20to%20node');
       url = router.url('books', 'programming', 'how to node');
       url.should.equal('/programming/how%20to%20node');
+
+      const err = router.url('not-exists', { category: 'programming', title: 'how to node' });
+      err.message.should.equal('No route found for name: not-exists');
       done();
     });
 
