@@ -1,4 +1,13 @@
 
+1.2.0 / 2019-02-13
+==================
+
+**features**
+  * [[`1a0036a`](http://github.com/eggjs/egg-router/commit/1a0036a64a023b6b7993fecffe8062d5d0150971)] - feat: add routerPath to respond to routerName (#2) (Khaidi Chu <<i@2333.moe>>)
+
+**others**
+  * [[`ff723fd`](http://github.com/eggjs/egg-router/commit/ff723fd03630ec49d5fe861abf129a583d214d22)] - chore: add koa-router license (#3) (fengmk2 <<fengmk2@gmail.com>>)
+
 1.1.0 / 2019-01-30
 ==================
 
