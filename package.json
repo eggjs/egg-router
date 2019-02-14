@@ -49,5 +49,8 @@
   "engines": {
     "node": ">= 8"
   },
+  "publishConfig": {
+    "tag": "latest-1"
+  },
   "license": "MIT"
 }
