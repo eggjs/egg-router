@@ -1,4 +1,10 @@
 
+1.3.0 / 2019-02-14
+==================
+
+**features**
+  * [[`f0b29ec`](https://github.com/eggjs/egg-router/commit/f0b29ec34df32ba9d872f6318f4febd2b4ef9359)] - refactor: use class instead prototype (#4) (fengmk2 <<fengmk2@gmail.com>>)
+
 1.2.0 / 2019-02-13
 ==================
 
