@@ -87,8 +87,8 @@ router
   });
 ```
 
-When a route is matched, its path is available at `ctx._matchedRoute` and if named,
-the name is available at `ctx._matchedRouteName`
+When a route is matched, its path is available at `ctx.routePath` and if named,
+the name is available at `ctx.routeName`
 
 Route paths will be translated to regular expressions using
 [path-to-regexp](https://github.com/pillarjs/path-to-regexp).

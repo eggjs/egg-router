@@ -1544,8 +1544,7 @@ describe('test/lib/router.test.js', function() {
         return next();
       };
 
-      router.use(middleware);
-      router.get('/users/:id', function(ctx) {
+      router.get('/users/:id', middleware, function(ctx) {
         expect(ctx._matchedRoute).to.be('/users/:id');
         should.exist(ctx.params.id);
         ctx.body = { hello: 'world' };
@@ -1596,6 +1595,33 @@ describe('test/lib/router.test.js', function() {
         .get('/users/1')
         .expect(200)
         .end(function(err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it('routerName and routerPath work with next', function(done) {
+      const app = new Koa();
+      const router = new Router();
+      router.get('name1', '/users/1', function (ctx, next) {
+        expect(ctx._matchedRouteName).to.be('name1');
+        expect(ctx.routerName).to.be('name1');
+        expect(ctx._matchedRoute).to.be('/users/1');
+        expect(ctx.routerPath).to.be('/users/1');
+        return next();
+      });
+      router.get('name2', '/users/:id', function (ctx) {
+        expect(ctx._matchedRouteName).to.be('name2');
+        expect(ctx.routerName).to.be('name2');
+        expect(ctx._matchedRoute).to.be('/users/:id');
+        expect(ctx.routerPath).to.be('/users/:id');
+        ctx.status = 200;
+      });
+
+      request(http.createServer(app.use(router.routes()).callback()))
+        .get('/users/1')
+        .expect(200)
+        .end(function (err) {
           if (err) return done(err);
           done();
         });
