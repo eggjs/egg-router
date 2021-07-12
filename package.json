@@ -51,6 +51,7 @@
     "lint": "eslint ."
   },
   "ci": {
+    "type": "github",
     "version": "8, 10, 11"
   },
   "engines": {
