@@ -1,4 +1,10 @@
 
+2.0.1 / 2021-07-12
+==================
+
+**fixes**
+  * [[`2c44ec0`](http://github.com/eggjs/egg-router/commit/2c44ec0bdeff1e8f46d899ed4386d1e28a93a854)] - fix: ensure ctx._matchedRoute and ctx._matchedRouteName to be correct (#7) (Yiyu He <<dead_horse@qq.com>>)
+
 2.0.0 / 2019-02-14
 ==================
 
