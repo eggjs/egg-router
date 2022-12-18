@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "egg-bin": "^4.10.0",
-    "egg-ci": "^1.11.0",
     "eslint": "^5.13.0",
     "eslint-config-egg": "^7.1.0",
     "expect.js": "^0.3.1",
@@ -50,12 +49,8 @@
     "ci": "npm run lint && egg-bin cov",
     "lint": "eslint ."
   },
-  "ci": {
-    "type": "github",
-    "version": "8, 10, 11"
-  },
   "engines": {
-    "node": ">= 8"
+    "node": ">= 8.5.0"
   },
   "license": "MIT"
 }
