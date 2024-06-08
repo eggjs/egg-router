@@ -34,7 +34,7 @@
     "utility": "^1.15.0"
   },
   "devDependencies": {
-    "egg-bin": "^4.10.0",
+    "egg-bin": "^6.4.0",
     "eslint": "^5.13.0",
     "eslint-config-egg": "^7.1.0",
     "expect.js": "^0.3.1",
