@@ -3,26 +3,31 @@
 Router core component for [Egg.js](https://github.com/eggjs).
 
 > **This repository is a fork of [koa-router](https://github.com/alexmingoia/koa-router).** with some additional features.
-
-> And thanks for the greate work of @alexmingoia and the original team.
+> And thanks for the great work of @alexmingoia and the original team.
 
 ## API Reference
 
-* [egg-router](#module_egg-router)
-    * [Router](#exp_module_egg-router--Router) ⏏
-        * [new Router([opts])](#new_module_egg-router--Router_new)
-        * _instance_
-            * [.get|put|post|patch|delete|del](#module_egg-router--Router+get|put|post|patch|delete|del) ⇒ <code>Router</code>
-            * [.routes](#module_egg-router--Router+routes) ⇒ <code>function</code>
-            * [.use([path], middleware)](#module_egg-router--Router+use) ⇒ <code>Router</code>
-            * [.prefix(prefix)](#module_egg-router--Router+prefix) ⇒ <code>Router</code>
-            * [.allowedMethods([options])](#module_egg-router--Router+allowedMethods) ⇒ <code>function</code>
-            * [.redirect(source, destination, [code])](#module_egg-router--Router+redirect) ⇒ <code>Router</code>
-            * [.route(name)](#module_egg-router--Router+route) ⇒ <code>Layer</code> &#124; <code>false</code>
-            * [.url(name, params, [options])](#module_egg-router--Router+url) ⇒ <code>String</code> &#124; <code>Error</code>
-            * [.param(param, middleware)](#module_egg-router--Router+param) ⇒ <code>Router</code>
-        * _static_
-            * [.url(path, params)](#module_egg-router--Router.url) ⇒ <code>String</code>
+- [@eggjs/router](#eggjsrouter)
+  - [API Reference](#api-reference)
+    - [Router ⏏](#router-)
+      - [new Router(\[opts\])](#new-routeropts)
+      - [router.get|put|post|patch|delete|del ⇒ Router](#routergetputpostpatchdeletedel--router)
+      - [Named routes](#named-routes)
+      - [Multiple middleware](#multiple-middleware)
+    - [Nested routers](#nested-routers)
+      - [Router prefixes](#router-prefixes)
+      - [URL parameters](#url-parameters)
+      - [router.routes ⇒ function](#routerroutes--function)
+      - [router.use(\[path\], middleware) ⇒ Router](#routerusepath-middleware--router)
+      - [router.prefix(prefix) ⇒ Router](#routerprefixprefix--router)
+      - [router.allowedMethods(\[options\]) ⇒ function](#routerallowedmethodsoptions--function)
+      - [router.redirect(source, destination, \[code\]) ⇒ Router](#routerredirectsource-destination-code--router)
+      - [router.route(name) ⇒ Layer | false](#routerroutename--layer--false)
+      - [router.url(name, params, \[options\]) ⇒ String | Error](#routerurlname-params-options--string--error)
+      - [router.param(param, middleware) ⇒ Router](#routerparamparam-middleware--router)
+      - [Router.url(path, params \[, options\]) ⇒ String](#routerurlpath-params--options--string)
+  - [Tests](#tests)
+  - [License](#license)
 
 <a name="exp_module_egg-router--Router"></a>
 
@@ -412,3 +417,7 @@ const url = Router.url('/users/:id', {id: 1}, {query: { active: true }});
 ## Tests
 
 Run tests using `npm test`.
+
+## License
+
+[MIT](LICENSE)
