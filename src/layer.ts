@@ -1,49 +1,76 @@
-'use strict';
+import { debuglog } from 'node:util';
+import pathToRegExp, { type Key } from 'path-to-regexp';
+import URI from 'urijs';
+import { decodeURIComponent as safeDecodeURIComponent } from 'utility';
+import type {
+  MiddlewareFunc,
+  MiddlewareFuncWithParamProperty,
+  ParamMiddlewareFunc,
+} from './types.js';
 
-const debug = require('debug')('egg-router:layer');
-const pathToRegExp = require('path-to-regexp');
-const uri = require('urijs');
-const utility = require('utility');
+const debug = debuglog('egg-router:layer');
 
-module.exports = class Layer {
+export interface LayerOptions {
+  prefix?: string;
+  /** route name */
+  name?: string;
+  /** case sensitive (default: false) */
+  sensitive?: boolean;
+  /** require the trailing slash (default: false) */
+  strict?: boolean;
+  ignoreCaptures?: boolean;
+}
+
+export interface LayerURLOptions {
+  query?: string | object;
+}
+
+export class Layer {
+  readonly opts: LayerOptions;
+  readonly name?: string;
+  readonly methods: string[] = [];
+  readonly stack: MiddlewareFuncWithParamProperty[];
+  path: string;
+  regexp: RegExp;
+  paramNames: Key[] = [];
+
   /**
    * Initialize a new routing Layer with given `method`, `path`, and `middleware`.
    *
    * @param {String|RegExp} path Path string or regular expression.
    * @param {Array} methods Array of HTTP verbs.
-   * @param {Array} middleware Layer callback/middleware or series of.
+   * @param {Array|Function} middlewares Layer callback/middleware or series of.
    * @param {Object=} opts optional params
    * @param {String=} opts.name route name
    * @param {String=} opts.sensitive case sensitive (default: false)
    * @param {String=} opts.strict require the trailing slash (default: false)
    * @private
    */
-  constructor(path, methods, middleware, opts) {
-    this.opts = opts || {};
-    this.name = this.opts.name || null;
-    this.methods = [];
-    this.paramNames = [];
-    this.stack = Array.isArray(middleware) ? middleware : [ middleware ];
+  constructor(path: string | RegExp, methods: string[], middlewares: MiddlewareFunc | MiddlewareFunc[], opts?: LayerOptions) {
+    this.opts = opts ?? {};
+    this.opts.prefix = this.opts.prefix ?? '';
+    this.name = this.opts.name;
+    this.stack = Array.isArray(middlewares) ? middlewares : [ middlewares ];
 
-    methods.forEach(function(method) {
+    for (const method of methods) {
       const l = this.methods.push(method.toUpperCase());
       if (this.methods[l - 1] === 'GET') {
         this.methods.unshift('HEAD');
       }
-    }, this);
+    }
 
     // ensure middleware is a function
-    this.stack.forEach(function(fn) {
+    this.stack.forEach(fn => {
       const type = (typeof fn);
       if (type !== 'function') {
-        throw new Error(
+        throw new TypeError(
           methods.toString() + ' `' + (this.opts.name || path) + '`: `middleware` '
-          + 'must be a function, not `' + type + '`'
+          + 'must be a function, not `' + type + '`',
         );
       }
-    }, this);
+    });
 
-    this.path = path;
+    this.path = typeof path === 'string' ? path : String(path);
     this.regexp = pathToRegExp(path, this.paramNames, this.opts);
 
     debug('defined route %s %s', this.methods, this.opts.prefix + this.path);
@@ -56,7 +83,7 @@ module.exports = class Layer {
    * @return {Boolean} matched or not
    * @private
    */
-  match(path) {
+  match(path: string): boolean {
     return this.regexp.test(path);
   }
 
@@ -69,13 +96,14 @@ module.exports = class Layer {
    * @return {Object} params object
    * @private
    */
-  params(path, captures, existingParams) {
+  params(path: string, captures: Array<string>, existingParams?: Record<string, any>): object {
     const params = existingParams || {};
 
     for (let len = captures.length, i = 0; i < len; i++) {
-      if (this.paramNames[i]) {
+      const paramName = this.paramNames[i];
+      if (paramName) {
         const c = captures[i];
-        params[this.paramNames[i].name] = c ? utility.decodeURIComponent(c) : c;
+        params[paramName.name] = c ? safeDecodeURIComponent(c) : c;
       }
     }
     return params;
@@ -88,9 +116,10 @@ module.exports = class Layer {
    * @return {Array.<String>} captures strings
    * @private
    */
-  captures(path) {
+  captures(path: string): Array<string> {
     if (this.opts.ignoreCaptures) return [];
-    return path.match(this.regexp).slice(1);
+    const m = path.match(this.regexp);
+    return m ? m.slice(1) : [];
   }
 
   /**
@@ -109,41 +138,51 @@ module.exports = class Layer {
    * @return {String} url string
    * @private
    */
-  url(params, options) {
-    let args = params;
+  url(params: object, options?: LayerURLOptions): string {
+    let args: Array<string | number> | object = params;
     const url = this.path.replace(/\(\.\*\)/g, '');
     const toPath = pathToRegExp.compile(url);
 
     if (typeof params !== 'object') {
+      // route.url(123, 456, options);
       args = Array.prototype.slice.call(arguments);
-      if (typeof args[args.length - 1] === 'object') {
-        options = args[args.length - 1];
-        args = args.slice(0, args.length - 1);
+      if (Array.isArray(args)) {
+        if (typeof args[args.length - 1] === 'object') {
+          options = args[args.length - 1];
+          args = args.slice(0, args.length - 1);
+        }
       }
     }
 
     const tokens = pathToRegExp.parse(url);
-    let replace = {};
+    let replace: Record<string, any> = {};
 
-    if (args instanceof Array) {
+    if (Array.isArray(args)) {
       for (let len = tokens.length, i = 0, j = 0; i < len; i++) {
-        if (tokens[i].name) replace[tokens[i].name] = args[j++];
+        const token = tokens[i];
+        if (typeof token === 'object' && token.name) {
+          replace[token.name] = args[j++];
+        }
       }
-    } else if (tokens.some(token => token.name)) {
+    } else if (tokens.some(token => typeof token === 'object' && token.name)) {
       replace = params;
     } else {
       options = params;
     }
 
-    let replaced = toPath(replace);
+    const replaced = toPath(replace);
 
-    if (options && options.query) {
-      replaced = new uri(replaced);
-      replaced.search(options.query);
-      return replaced.toString();
+    if (options?.query) {
+      const urlObject = new URI(replaced);
+      urlObject.search(options.query);
+      return urlObject.toString();
     }
 
     return replaced;
+  }
+
+  #urlWithArgs(args: any[], options?: object) {
+
   }
 
   /**
@@ -168,15 +207,15 @@ module.exports = class Layer {
    * @return {Layer} layer instance
    * @private
    */
-  param(param, fn) {
+  param(param: string, fn: ParamMiddlewareFunc): Layer {
     const stack = this.stack;
     const params = this.paramNames;
-    const middleware = function(ctx, next) {
+    const middleware: MiddlewareFuncWithParamProperty = function(this: any, ctx, next) {
       return fn.call(this, ctx.params[param], ctx, next);
     };
     middleware.param = param;
 
-    const names = params.map(function(p) {
+    const names = params.map(p => {
       return p.name;
     });
 
@@ -205,13 +244,12 @@ module.exports = class Layer {
    * @return {Layer} layer instance
    * @private
    */
-  setPrefix(prefix) {
+  setPrefix(prefix: string): Layer {
     if (this.path) {
       this.path = prefix + this.path;
       this.paramNames = [];
       this.regexp = pathToRegExp(this.path, this.paramNames, this.opts);
     }
-
     return this;
   }
-};
+}

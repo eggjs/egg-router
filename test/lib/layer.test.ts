@@ -1,15 +1,12 @@
-'use strict';
+import Application from '@eggjs/koa';
+import http from 'http';
+import request from 'supertest';
+import Router from '../../lib/router';
+import Layer from '../../lib/layer';
 
-const Koa = require('koa');
-const http = require('http');
-const request = require('supertest');
-require('should');
-const Router = require('../../lib/router');
-const Layer = require('../../lib/layer');
-
-describe('test/lib/layer.test.js', function() {
+describe('test/lib/layer.test.js', () => {
   it('composes multiple callbacks/middlware', function(done) {
-    const app = new Koa();
+    const app = new Application();
     const router = new Router();
     app.use(router.routes());
     router.get(
@@ -21,7 +18,7 @@ describe('test/lib/layer.test.js', function() {
       function(ctx, next) {
         ctx.status = 204;
         return next();
-      }
+      },
     );
     request(http.createServer(app.callback()))
       .get('/programming/how-to-node')
