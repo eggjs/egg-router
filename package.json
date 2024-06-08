@@ -1,6 +1,13 @@
 {
   "name": "@eggjs/router",
   "version": "2.0.1",
+  "engines": {
+    "node": ">= 8.5.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest-2"
+  },
   "description": "Router middleware for egg/koa. Provides RESTful resource routing.",
   "repository": {
     "type": "git",
@@ -48,9 +55,6 @@
     "test": "npm run lint && egg-bin test",
     "ci": "npm run lint && egg-bin cov",
     "lint": "eslint ."
-  },
-  "engines": {
-    "node": ">= 8.5.0"
   },
   "license": "MIT"
 }
