@@ -1,6 +1,9 @@
 import { isFunction, isGeneratorFunction } from 'is-type-of';
+import { MiddlewareFunc } from './types.js';
 
-export async function callFn(fn: Function, args: any[], ctx: unknown): Promise<unknown> {
+type Fn = (...args: any[]) => any;
+
+export async function callFn(fn: Fn, args: any[], ctx: unknown) {
   args = args || [];
   if (!isFunction(fn)) {
     return;
@@ -11,7 +14,7 @@ export async function callFn(fn: Function, args: any[], ctx: unknown): Promise<u
   return ctx ? fn.call(ctx, ...args) : fn(...args);
 }
 
-export function middleware(fn: Function) {
+export function middleware(fn: MiddlewareFunc) {
   if (isGeneratorFunction(fn)) {
     throw new TypeError(`Please use async function instead of generator function: ${fn.toString()}`);
   }

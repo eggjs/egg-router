@@ -19,6 +19,7 @@ export interface LayerOptions {
   /** require the trailing slash (default: false) */
   strict?: boolean;
   ignoreCaptures?: boolean;
+  end?: boolean;
 }
 
 export interface LayerURLOptions {
@@ -46,7 +47,12 @@ export class Layer {
    * @param {String=} opts.strict require the trailing slash (default: false)
    * @private
    */
-  constructor(path: string | RegExp, methods: string[], middlewares: MiddlewareFunc | MiddlewareFunc[], opts?: LayerOptions) {
+  constructor(path: string | RegExp, methods: string[], middlewares: MiddlewareFunc | MiddlewareFunc[],
+    opts?: LayerOptions | string) {
+    if (typeof opts === 'string') {
+      // new Layer(path, methods, middlewares, name);
+      opts = { name: opts };
+    }
     this.opts = opts ?? {};
     this.opts.prefix = this.opts.prefix ?? '';
     this.name = this.opts.name;
@@ -90,14 +96,14 @@ export class Layer {
   /**
    * Returns map of URL parameters for given `path` and `paramNames`.
    *
-   * @param {String} path path string
+   * @param {String} _path path string
    * @param {Array.<String>} captures captures strings
-   * @param {Object=} existingParams existing params
+   * @param {Object=} [existingParams] existing params
    * @return {Object} params object
    * @private
    */
-  params(path: string, captures: Array<string>, existingParams?: Record<string, any>): object {
-    const params = existingParams || {};
+  params(_path: string, captures: Array<string>, existingParams?: Record<string, string>): Record<string, string> {
+    const params = existingParams ?? {};
 
     for (let len = captures.length, i = 0; i < len; i++) {
       const paramName = this.paramNames[i];
@@ -130,26 +136,30 @@ export class Layer {
    * ```javascript
    * var route = new Layer(['GET'], '/users/:id', fn);
    *
+   * route.url(123); // => "/users/123"
+   * route.url('123'); // => "/users/123"
    * route.url({ id: 123 }); // => "/users/123"
    * ```
    *
    * @param {Object} params url parameters
-   * @param {Object} [options] optional parameters
+   * @param {Object} paramsOrOptions optional parameters
    * @return {String} url string
    * @private
    */
-  url(params: object, options?: LayerURLOptions): string {
-    let args: Array<string | number> | object = params;
+  url(params?: string | number | object, ...paramsOrOptions: (string | number | object | LayerURLOptions)[]): string {
+    let args: Array<string | number | object> | object = params as object;
     const url = this.path.replace(/\(\.\*\)/g, '');
     const toPath = pathToRegExp.compile(url);
+    let options: LayerURLOptions | undefined;
 
-    if (typeof params !== 'object') {
-      // route.url(123, 456, options);
-      args = Array.prototype.slice.call(arguments);
+    if (params !== undefined && typeof params !== 'object') {
+      args = [ params, ...paramsOrOptions ];
+      // route.url(params1, params2, ..., options);
       if (Array.isArray(args)) {
-        if (typeof args[args.length - 1] === 'object') {
-          options = args[args.length - 1];
-          args = args.slice(0, args.length - 1);
+        const lastIndex = args.length - 1;
+        if (typeof args[lastIndex] === 'object') {
+          options = paramsOrOptions[lastIndex] as LayerURLOptions;
+          args = paramsOrOptions.slice(0, lastIndex);
         }
       }
     }
@@ -165,9 +175,11 @@ export class Layer {
         }
       }
     } else if (tokens.some(token => typeof token === 'object' && token.name)) {
-      replace = params;
+      // route.url(params);
+      replace = params as object;
     } else {
-      options = params;
+      // route.url(options);
+      options = params as LayerURLOptions;
     }
 
     const replaced = toPath(replace);
@@ -179,10 +191,6 @@ export class Layer {
     }
 
     return replaced;
-  }
-
-  #urlWithArgs(args: any[], options?: object) {
-
   }
 
   /**
