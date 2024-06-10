@@ -1,10 +1,10 @@
 import { strict as assert } from 'node:assert';
 import Application from '@eggjs/koa';
 import request from 'supertest';
-import { Router } from '../../src/router.js';
-import { Layer } from '../../src/layer.js';
+import { Router } from '../src/router.js';
+import { Layer } from '../src/Layer2.js';
 
-describe('test/lib/layer.test.js', () => {
+describe('test/layer.test.ts', () => {
   it('composes multiple callbacks/middleware', async () => {
     const app = new Application();
     const router = new Router();

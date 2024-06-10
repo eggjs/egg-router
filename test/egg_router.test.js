@@ -1,6 +1,6 @@
 'use strict';
 
-const EggRouter = require('../../').EggRouter;
+const EggRouter = require('../dist/commonjs').EggRouter;
 const assert = require('assert');
 const is = require('is-type-of');
 

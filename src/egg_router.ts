@@ -1,11 +1,9 @@
-'use strict';
-
-const is = require('is-type-of');
-const Router = require('./router');
-const utility = require('utility');
-const inflection = require('inflection');
-const assert = require('assert');
-const utils = require('./utils');
+import is from 'is-type-of';
+import Router from './router';
+import utility from 'utility';
+import inflection from 'inflection';
+import assert from 'assert';
+import utils from './utils';
 
 const METHODS = [ 'head', 'options', 'get', 'put', 'patch', 'post', 'delete' ];
 

@@ -1,7 +1,6 @@
-'use strict';
-
-const Koa = require('koa');
-const Router = require('../');
+/* eslint-disable @typescript-eslint/no-var-requires */
+const Koa = require('@eggjs/koa');
+const Router = require('../dist/commonjs');
 
 const app = new Koa();
 const router = new Router();

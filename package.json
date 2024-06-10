@@ -60,6 +60,10 @@
     "prepublishOnly": "tshy && tshy-after"
   },
   "license": "MIT",
+  "files": [
+    "dist",
+    "src"
+  ],
   "type": "module",
   "tshy": {
     "exports": {
@@ -82,10 +86,6 @@
       }
     }
   },
-  "files": [
-    "dist",
-    "src"
-  ],
   "main": "./dist/commonjs/index.js",
   "types": "./dist/commonjs/index.d.ts"
 }
