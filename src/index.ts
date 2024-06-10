@@ -1,6 +1,6 @@
-import { Router } from './router.js';
+import { Router } from './Router2.js';
 
-export * from './router.js';
+export * from './Router2.js';
 // import EggRouter from './lib/egg_router';
 
 export const KoaRouter = Router;
