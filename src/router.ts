@@ -7,7 +7,7 @@ import assert from 'node:assert';
 import compose from 'koa-compose';
 import HttpError from 'http-errors';
 import methods from 'methods';
-import { Layer, LayerURLOptions } from './Layer2.js';
+import { Layer, LayerURLOptions } from './Layer.js';
 import { MiddlewareFunc, MiddlewareFuncWithRouter, Next, ParamMiddlewareFunc } from './types.js';
 
 const debug = debuglog('egg-router:router');
