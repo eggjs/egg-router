@@ -401,17 +401,26 @@ export class Router {
     methods: string[],
     middleware: MiddlewareFunc | MiddlewareFunc[],
     opts?: RegisterOptions): Layer | Layer[] {
-    opts = opts ?? {};
     // support array of paths
     if (Array.isArray(path)) {
       const routes: Layer[] = [];
       for (const p of path) {
-        const route = this.register(p, methods, middleware, opts) as Layer;
+        const route = this.#register(p, methods, middleware, opts);
         routes.push(route);
       }
       return routes;
     }
 
+    // create route
+    const route = this.#register(path, methods, middleware, opts);
+    return route;
+  }
+
+  #register(path: string | RegExp,
+    methods: string[],
+    middleware: MiddlewareFunc | MiddlewareFunc[],
+    opts?: RegisterOptions): Layer {
+    opts = opts ?? {};
     // create route
     const route = new Layer(path, methods, middleware, {
       end: opts.end === false ? opts.end : true,
@@ -478,12 +487,6 @@ export class Router {
    * router.url('user', { id: 3 }, { query: "limit=1" });
    * // => "/users/3?limit=1"
    * ```
-   *
-   * @param {String} name route name
-   * @param {Object} params url parameters
-   * @param {Object} [options] options parameter
-   * @param {Object|String} [options.query] query options
-   * @return {String|Error} string or error instance
    */
   url(name: string, params?: string | number | object,
     ...paramsOrOptions: (string | number | object | LayerURLOptions)[]): string | Error {
@@ -733,13 +736,6 @@ export class Router {
    * The [path-to-regexp](https://github.com/pillarjs/path-to-regexp) module is
    * used to convert paths to regular expressions.
    *
-   * @name get|put|post|patch|delete|del
-   * @memberof module:koa-router.prototype
-   * @param {String} method http method
-   * @param {String} nameOrPath http path
-   * @param {Function=} pathOrMiddleware route middleware(s)
-   * @param {Function} middlewares middlewares
-   * @return {Router} Router instance
    */
   verb(method: string | string[],
     nameOrPath: string | RegExp | (string | RegExp)[],

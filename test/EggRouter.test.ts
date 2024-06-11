@@ -55,6 +55,31 @@ describe('test/EggRouter.test.ts', () => {
     assert(router.stack[1].stack.length === 1);
   });
 
+  it('should app.verb([url1, url2], controller) work', () => {
+    const app = {
+      controller: {
+        async foo() { return; },
+        hello: {
+          world() { return; },
+        },
+      },
+    };
+
+    const router = new EggRouter({}, app);
+    router.get([ '/foo', '/bar' ], app.controller.foo);
+    router.post('/hello/world', app.controller.hello.world);
+
+    assert(router.stack[0].path === '/foo');
+    assert.deepEqual(router.stack[0].methods, [ 'HEAD', 'GET' ]);
+    assert(router.stack[0].stack.length === 1);
+    assert(router.stack[1].path === '/bar');
+    assert.deepEqual(router.stack[1].methods, [ 'HEAD', 'GET' ]);
+    assert(router.stack[2].stack.length === 1);
+    assert(router.stack[2].path === '/hello/world');
+    assert.deepEqual(router.stack[2].methods, [ 'POST' ]);
+    assert(router.stack[2].stack.length === 1);
+  });
+
   it('should app.verb(name, url, controller) work', () => {
     const app = {
       controller: {

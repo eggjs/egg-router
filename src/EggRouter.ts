@@ -72,30 +72,11 @@ export class EggRouter extends Router {
     this.app = app;
   }
 
-  #formatRouteParams(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc | ResourcesController,
-    middlewares: (MiddlewareFunc | string | ResourcesController)[]) {
-    const options: RegisterOptions = {};
-    let path: string | RegExp;
-    if (typeof pathOrMiddleware === 'string' || pathOrMiddleware instanceof RegExp) {
-      // verb(method, name, path, ...middlewares)
-      path = pathOrMiddleware;
-      assert(typeof nameOrPath === 'string', 'route name should be string');
-      options.name = nameOrPath;
-    } else {
-      // verb(method, path, ...middlewares)
-      path = nameOrPath;
-      middlewares = [ pathOrMiddleware, ...middlewares ];
-    }
-    return {
-      path,
-      middlewares,
-      options,
-    };
-  }
-
-  verb(method: RouterMethod | RouterMethod[], nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  verb(method: RouterMethod | RouterMethod[],
+    nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middleware: (MiddlewareFunc | string)[]) {
-    const { path, middlewares, options } = this.#formatRouteParams(nameOrPath, pathOrMiddleware, middleware);
+    const { path, middlewares, options } = this._formatRouteParams(nameOrPath, pathOrMiddleware, middleware);
     if (typeof method === 'string') {
       method = [ method ];
     }
@@ -104,56 +85,64 @@ export class EggRouter extends Router {
   }
 
   // const METHODS = [ 'head', 'options', 'get', 'put', 'patch', 'post', 'delete', 'all' ];
-  head(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  head(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  head(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  head(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  head(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  head(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('head', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  options(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  options(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  options(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  options(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  options(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  options(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('options', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  get(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  get(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  get(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  get(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  get(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  get(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('get', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  put(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  put(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  put(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  put(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  put(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  put(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('put', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  patch(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  patch(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  patch(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  patch(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  patch(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  patch(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('patch', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  post(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  post(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  post(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  post(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  post(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  post(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('post', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  delete(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  delete(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  delete(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  delete(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  delete(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  delete(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb('delete', nameOrPath, pathOrMiddleware, ...middlewares);
   }
-  all(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  all(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
-  all(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+  all(path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  all(name: string, path: string | RegExp | (string | RegExp)[], ...middlewares: (MiddlewareFunc | string)[]): Router;
+  all(nameOrPath: string | RegExp | (string | RegExp)[],
+    pathOrMiddleware: string | RegExp | (string | RegExp)[] | MiddlewareFunc,
     ...middlewares: (MiddlewareFunc | string)[]): Router {
     return this.verb(methods, nameOrPath, pathOrMiddleware, ...middlewares);
   }
 
-  register(path: string | string[] | RegExp | RegExp[],
+  register(path: string | RegExp | (string | RegExp)[],
     methods: string[],
     middleware: MiddlewareFunc | string | (MiddlewareFunc | string | ResourcesController)[],
     opts?: RegisterOptions) {
@@ -213,7 +202,7 @@ export class EggRouter extends Router {
   resources(name: string, prefix: string, middleware: MiddlewareFunc, controller: string | ResourcesController): Router;
   resources(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc | ResourcesController,
     ...middleware: (MiddlewareFunc | string | ResourcesController)[]): Router {
-    const { path, middlewares, options } = this.#formatRouteParams(nameOrPath, pathOrMiddleware, middleware);
+    const { path, middlewares, options } = this._formatRouteParams(nameOrPath, pathOrMiddleware, middleware);
     // last argument is Controller object
     const controller = resolveController(middlewares.pop()!, this.app);
     for (const key in REST_MAP) {
