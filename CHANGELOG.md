@@ -1,3 +1,53 @@
+# Changelog
+
+## [3.0.0](https://github.com/eggjs/egg-router/compare/v2.0.1...v3.0.0) (2024-06-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Node.js < 18.7.0 support
+
+- Drop generator function support
+- Drop Node.js < 18.7.0 support
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai
+-->
+
+## Summary by CodeRabbit
+
+- **New Features**
+- Introduced `EggRouter` class for defining RESTful routes and handling
+HTTP verbs.
+- Added new utility functions and type definitions to support enhanced
+routing and middleware functionalities.
+
+- **Bug Fixes**
+- Updated test cases to ensure compatibility with new routing and
+middleware functionalities.
+
+- **Documentation**
+- Updated examples in the `README.md` to reflect TypeScript syntax and
+ES module imports.
+- Mentioned breaking changes for version 3, including dropping support
+for generator functions and Node.js versions below 18.7.0.
+
+- **Breaking Changes**
+  - Dropped support for generator functions.
+  - Dropped support for Node.js versions below 18.7.0.
+
+- **Chores**
+  - Updated Node.js versions in the GitHub Actions workflow.
+  - Modified `.gitignore` to include additional patterns.
+  - Updated dependencies and dev dependencies in `package.json`.
+- Added new scripts for linting, testing, and pre-publish actions in
+`package.json`.
+  - Introduced a new `tsconfig.json` for strict TypeScript settings.
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
+### Features
+
+* support cjs and esm both ([#10](https://github.com/eggjs/egg-router/issues/10)) ([55149bc](https://github.com/eggjs/egg-router/commit/55149bc871def88d190e856e81cb9a48f18f3979))
 
 2.0.1 / 2021-07-12
 ==================
