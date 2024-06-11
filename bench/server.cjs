@@ -1,9 +1,8 @@
-'use strict';
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { Application } = require('@eggjs/koa');
+const { Router } = require('../dist/commonjs');
 
-const Koa = require('koa');
-const Router = require('../');
-
-const app = new Koa();
+const app = new Application();
 const router = new Router();
 
 const ok = ctx => {
@@ -36,8 +35,8 @@ for (let i = n; i > 0; i--) {
   const child = new Router();
   if (useMiddleware) child.use((ctx, next) => next());
   child.get(`/:${''.padStart(i, 'a')}`, ok);
-  child.nest('/grandchild', grandchild);
-  router.nest(`/${i}/child`, child);
+  // child.use('/grandchild', grandchild);
+  // router.use(`/${i}/child`, child);
 }
 
 if (process.env.DEBUG) {

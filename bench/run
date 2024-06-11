@@ -8,7 +8,7 @@ export PORT=3333
 
 host="http://localhost:$PORT"
 
-node "$(dirname $0)/server.js" &
+node "$(dirname $0)/server.cjs" &
 
 pid=$!
 

@@ -27,34 +27,36 @@ Router core component for [Egg.js](https://github.com/eggjs).
       - [router.param(param, middleware) ⇒ Router](#routerparamparam-middleware--router)
       - [Router.url(path, params \[, options\]) ⇒ String](#routerurlpath-params--options--string)
   - [Tests](#tests)
+  - [Breaking changes on v3](#breaking-changes-on-v3)
   - [License](#license)
 
 <a name="exp_module_egg-router--Router"></a>
 
 ### Router ⏏
+
 **Kind**: Exported class
 <a name="new_module_egg-router--Router_new"></a>
 
 #### new Router([opts])
+
 Create a new router.
 
-
 | Param | Type | Description |
-| --- | --- | --- |
+| ---   | ---   | --- |
 | [opts] | <code>Object</code> |  |
 | [opts.prefix] | <code>String</code> | prefix router paths |
 
 **Example**
 Basic usage:
 
-```javascript
-var Koa = require('koa');
-var Router = require('@eggjs/router');
+```ts
+import Koa from '@eggjs/koa';
+import Router from '@eggjs/router';
 
-var app = new Koa();
-var router = new Router();
+const app = new Koa();
+const router = new Router();
 
-router.get('/', (ctx, next) => {
+router.get('/', async (ctx, next) => {
   // ctx.router available
 });
 
@@ -62,9 +64,11 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 ```
+
 <a name="module_egg-router--Router+get|put|post|patch|delete|del"></a>
 
 #### router.get|put|post|patch|delete|del ⇒ <code>Router</code>
+
 Create `router.verb()` methods, where *verb* is one of the HTTP verbs such
 as `router.get()` or `router.post()`.
 
@@ -73,7 +77,7 @@ where **verb** is one of the HTTP verbs such as `router.get()` or `router.post()
 
 Additionaly, `router.all()` can be used to match against all methods.
 
-```javascript
+```ts
 router
   .get('/', (ctx, next) => {
     ctx.body = 'Hello World!';
@@ -105,7 +109,7 @@ Query strings will not be considered when matching requests.
 Routes can optionally have names. This allows generation of URLs and easy
 renaming of URLs during development.
 
-```javascript
+```ts
 router.get('user', '/users/:id', (ctx, next) => {
  // ...
 });
@@ -118,7 +122,7 @@ router.url('user', 3);
 
 Multiple middleware may be given:
 
-```javascript
+```ts
 router.get(
   '/users/:id',
   (ctx, next) => {
@@ -138,9 +142,9 @@ router.get(
 
 Nesting routers is supported:
 
-```javascript
-var forums = new Router();
-var posts = new Router();
+```ts
+const forums = new Router();
+const posts = new Router();
 
 posts.get('/', (ctx, next) => {...});
 posts.get('/:pid', (ctx, next) => {...});
@@ -154,8 +158,8 @@ app.use(forums.routes());
 
 Route paths can be prefixed at the router level:
 
-```javascript
-var router = new Router({
+```ts
+const router = new Router({
   prefix: '/users'
 });
 
@@ -167,7 +171,7 @@ router.get('/:id', ...); // responds to "/users/:id"
 
 Named route parameters are captured and added to `ctx.params`.
 
-```javascript
+```ts
 router.get('/:category/:title', (ctx, next) => {
   console.log(ctx.params);
   // => { category: 'programming', title: 'how-to-node' }
@@ -180,7 +184,7 @@ used to convert paths to regular expressions.
 **Kind**: instance property of <code>[Router](#exp_module_egg-router--Router)</code>
 
 | Param | Type | Description |
-| --- | --- | --- |
+| ---   | ---  | --- |
 | path | <code>String</code> |  |
 | [middleware] | <code>function</code> | route middleware(s) |
 | callback | <code>function</code> | route callback |
@@ -194,6 +198,7 @@ Returns router middleware which dispatches a route matching the request.
 <a name="module_egg-router--Router+use"></a>
 
 #### router.use([path], middleware) ⇒ <code>Router</code>
+
 Use given middleware.
 
 Middleware run in the order they are defined by `.use()`. They are invoked
@@ -209,7 +214,8 @@ sequentially, requests start at the first middleware and work their way
 | [...] | <code>function</code> |
 
 **Example**
-```javascript
+
+```ts
 // session middleware will run before authorize
 router
   .use(session())
@@ -223,9 +229,11 @@ router.use(['/users', '/admin'], userAuth());
 
 app.use(router.routes());
 ```
+
 <a name="module_egg-router--Router+prefix"></a>
 
 #### router.prefix(prefix) ⇒ <code>Router</code>
+
 Set the path prefix for a Router instance that was already initialized.
 
 **Kind**: instance method of <code>[Router](#exp_module_egg-router--Router)</code>
@@ -235,12 +243,15 @@ Set the path prefix for a Router instance that was already initialized.
 | prefix | <code>String</code> |
 
 **Example**
-```javascript
+
+```ts
 router.prefix('/things/:thing_id')
 ```
+
 <a name="module_egg-router--Router+allowedMethods"></a>
 
 #### router.allowedMethods([options]) ⇒ <code>function</code>
+
 Returns separate middleware for responding to `OPTIONS` requests with
 an `Allow` header containing the allowed methods, as well as responding
 with `405 Method Not Allowed` and `501 Not Implemented` as appropriate.
@@ -255,12 +266,13 @@ with `405 Method Not Allowed` and `501 Not Implemented` as appropriate.
 | [options.methodNotAllowed] | <code>function</code> | throw the returned value in place of the default MethodNotAllowed error |
 
 **Example**
-```javascript
-var Koa = require('koa');
-var Router = require('egg-router');
 
-var app = new Koa();
-var router = new Router();
+```ts
+import Koa from '@eggjs/koa';
+import Router from '@eggjs/router';
+
+const app = new Koa();
+const router = new Router();
 
 app.use(router.routes());
 app.use(router.allowedMethods());
@@ -268,13 +280,13 @@ app.use(router.allowedMethods());
 
 **Example with [Boom](https://github.com/hapijs/boom)**
 
-```javascript
-var Koa = require('koa');
-var Router = require('egg-router');
-var Boom = require('boom');
+```ts
+import Koa from '@eggjs/koa';
+import Router from '@eggjs/router';
+import Boom from 'boom';
 
-var app = new Koa();
-var router = new Router();
+const app = new Koa();
+const router = new Router();
 
 app.use(router.routes());
 app.use(router.allowedMethods({
@@ -283,9 +295,11 @@ app.use(router.allowedMethods({
   methodNotAllowed: () => new Boom.methodNotAllowed()
 }));
 ```
+
 <a name="module_egg-router--Router+redirect"></a>
 
 #### router.redirect(source, destination, [code]) ⇒ <code>Router</code>
+
 Redirect `source` to `destination` URL with optional 30x status `code`.
 
 Both `source` and `destination` can be route names.
@@ -296,7 +310,7 @@ router.redirect('/login', 'sign-in');
 
 This is equivalent to:
 
-```javascript
+```ts
 router.all('/login', ctx => {
   ctx.redirect('/sign-in');
   ctx.status = 301;
@@ -314,6 +328,7 @@ router.all('/login', ctx => {
 <a name="module_egg-router--Router+route"></a>
 
 #### router.route(name) ⇒ <code>Layer</code> &#124; <code>false</code>
+
 Lookup route with given `name`.
 
 **Kind**: instance method of <code>[Router](#exp_module_egg-router--Router)</code>
@@ -325,6 +340,7 @@ Lookup route with given `name`.
 <a name="module_egg-router--Router+url"></a>
 
 #### router.url(name, params, [options]) ⇒ <code>String</code> &#124; <code>Error</code>
+
 Generate URL for route. Takes a route name and map of named `params`.
 
 **Kind**: instance method of <code>[Router](#exp_module_egg-router--Router)</code>
@@ -337,7 +353,8 @@ Generate URL for route. Takes a route name and map of named `params`.
 | [options.query] | <code>Object</code> &#124; <code>String</code> | query options |
 
 **Example**
-```javascript
+
+```ts
 router.get('user', '/users/:id', (ctx, next) => {
   // ...
 });
@@ -359,9 +376,11 @@ router.url('user', { id: 3 }, { query: { limit: 1 } });
 router.url('user', { id: 3 }, { query: "limit=1" });
 // => "/users/3?limit=1"
 ```
+
 <a name="module_egg-router--Router+param"></a>
 
 #### router.param(param, middleware) ⇒ <code>Router</code>
+
 Run middleware for named route parameters. Useful for auto-loading or
 validation.
 
@@ -373,7 +392,8 @@ validation.
 | middleware | <code>function</code> |
 
 **Example**
-```javascript
+
+```ts
 router
   .param('user', (id, ctx, next) => {
     ctx.user = users[id];
@@ -391,9 +411,11 @@ router
   // /users/3 => {"id": 3, "name": "Alex"}
   // /users/3/friends => [{"id": 4, "name": "TJ"}]
 ```
+
 <a name="module_egg-router--Router.url"></a>
 
 #### Router.url(path, params [, options]) ⇒ <code>String</code>
+
 Generate URL from url pattern and given `params`.
 
 **Kind**: static method of <code>[Router](#exp_module_egg-router--Router)</code>
@@ -406,8 +428,9 @@ Generate URL from url pattern and given `params`.
 | [options.query] | <code>Object</code> &#124; <code>String</code> | query options |
 
 **Example**
-```javascript
-var url = Router.url('/users/:id', {id: 1});
+
+```ts
+const url = Router.url('/users/:id', {id: 1});
 // => "/users/1"
 
 const url = Router.url('/users/:id', {id: 1}, {query: { active: true }});
@@ -417,6 +440,11 @@ const url = Router.url('/users/:id', {id: 1}, {query: { active: true }});
 ## Tests
 
 Run tests using `npm test`.
+
+## Breaking changes on v3
+
+- Drop generator function support
+- Drop Node.js < 18.7.0 support
 
 ## License
 

@@ -42,3 +42,6 @@ yarn.lock
 !.env.test
 
 .DS_Store
+
+.tshy*
+dist
