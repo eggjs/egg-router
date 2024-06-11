@@ -956,6 +956,17 @@ describe('test/lib/router.test.js', () => {
         .expect(301);
       assert.equal(res.headers.location, '/sign-up-form');
     });
+
+    it('registers redirect not exists routes', () => {
+      const router = new Router();
+      assert(typeof router.redirect === 'function');
+      assert.throws(() => {
+        router.redirect('source-not-exists', '/destination', 302);
+      }, /Error: No route found for name: source-not-exists/);
+      assert.throws(() => {
+        router.redirect('/source', 'destination-not-exists');
+      }, /Error: No route found for name: destination-not-exists/);
+    });
   });
 
   describe('Router#route()', () => {

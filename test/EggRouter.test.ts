@@ -53,6 +53,13 @@ describe('test/EggRouter.test.ts', () => {
     assert(router.stack[1].path === '/hello/world');
     assert.deepEqual(router.stack[1].methods, [ 'POST' ]);
     assert(router.stack[1].stack.length === 1);
+
+    router.head('/foo-head', app.controller.foo);
+    router.options('/foo-options', app.controller.foo);
+    router.put('/foo-put', app.controller.foo);
+    router.patch('/foo-patch', app.controller.foo);
+    router.delete('/foo-delete', app.controller.foo);
+    router.all('/foo-all', app.controller.foo);
   });
 
   it('should app.verb([url1, url2], controller) work', () => {
