@@ -2,6 +2,7 @@ import { debuglog } from 'node:util';
 import pathToRegExp, { type Key } from 'path-to-regexp';
 import URI from 'urijs';
 import { decodeURIComponent as safeDecodeURIComponent } from 'utility';
+import { isGeneratorFunction } from 'is-type-of';
 import type {
   MiddlewareFunc,
   MiddlewareFuncWithParamProperty,
@@ -31,7 +32,7 @@ export class Layer {
   readonly name?: string;
   readonly methods: string[] = [];
   readonly stack: MiddlewareFuncWithParamProperty[];
-  path: string;
+  path: string | RegExp;
   regexp: RegExp;
   paramNames: Key[] = [];
 
@@ -67,16 +68,21 @@ export class Layer {
 
     // ensure middleware is a function
     this.stack.forEach(fn => {
-      const type = (typeof fn);
+      const type = typeof fn;
       if (type !== 'function') {
         throw new TypeError(
           methods.toString() + ' `' + (this.opts.name || path) + '`: `middleware` '
           + 'must be a function, not `' + type + '`',
         );
       }
+      if (isGeneratorFunction(fn)) {
+        throw new TypeError(
+          methods.toString() + ' `' + (this.opts.name || path) + '`: Please use async function instead of generator function',
+        );
+      }
     });
 
-    this.path = typeof path === 'string' ? path : String(path);
+    this.path = path;
     this.regexp = pathToRegExp(path, this.paramNames, this.opts);
 
     debug('defined route %s %s', this.methods, this.opts.prefix + this.path);
@@ -148,19 +154,24 @@ export class Layer {
    */
   url(params?: string | number | object, ...paramsOrOptions: (string | number | object | LayerURLOptions)[]): string {
     let args: Array<string | number | object> | object = params as object;
-    const url = this.path.replace(/\(\.\*\)/g, '');
+    const url = (this.path as string).replace(/\(\.\*\)/g, '');
     const toPath = pathToRegExp.compile(url);
     let options: LayerURLOptions | undefined;
 
     if (params !== undefined && typeof params !== 'object') {
       args = [ params, ...paramsOrOptions ];
-      // route.url(params1, params2, ..., options);
+      // route.url(stringOrNumber, params1, ..., options);
       if (Array.isArray(args)) {
         const lastIndex = args.length - 1;
         if (typeof args[lastIndex] === 'object') {
-          options = paramsOrOptions[lastIndex] as LayerURLOptions;
-          args = paramsOrOptions.slice(0, lastIndex);
+          options = args[lastIndex];
+          args = args.slice(0, lastIndex);
         }
+      }
+    } else if (typeof params === 'object') {
+      if (typeof paramsOrOptions[0] === 'object' && 'query' in paramsOrOptions[0]) {
+        // route.url(param, options);
+        options = paramsOrOptions[0];
       }
     }
 

@@ -1,13 +1,18 @@
-import is from 'is-type-of';
-import Router from './router';
-import utility from 'utility';
+import assert from 'node:assert';
+import { encodeURIComponent as safeEncodeURIComponent } from 'utility';
 import inflection from 'inflection';
-import assert from 'assert';
-import utils from './utils';
+import methods from 'methods';
+import { RegisterOptions, Router, RouterMethod, RouterOptions } from './Router.js';
+import { MiddlewareFunc, ResourcesController } from './types.js';
 
-const METHODS = [ 'head', 'options', 'get', 'put', 'patch', 'post', 'delete' ];
+interface RestfulOptions {
+  suffix?: string;
+  namePrefix?: string;
+  method: string | string[];
+  member?: true;
+}
 
-const REST_MAP = {
+const REST_MAP: Record<string, RestfulOptions> = {
   index: {
     suffix: '',
     method: 'GET',
@@ -47,49 +52,115 @@ const REST_MAP = {
   },
 };
 
+interface Application {
+  controller: Record<string, any>;
+}
+
 /**
  * FIXME: move these patch into @eggjs/router
  */
-class EggRouter extends Router {
+export class EggRouter extends Router {
+  readonly app: Application;
 
   /**
    * @class
    * @param {Object} opts - Router options.
    * @param {Application} app - Application object.
    */
-  constructor(opts, app) {
+  constructor(opts: RouterOptions, app: Application) {
     super(opts);
     this.app = app;
-    this.patchRouterMethod();
   }
 
-  patchRouterMethod() {
-    // patch router methods to support generator function middleware and string controller
-    METHODS.concat([ 'all' ]).forEach(method => {
-      this[method] = (...args) => {
-        const splited = spliteAndResolveRouterParams({ args, app: this.app });
-        // format and rebuild params
-        args = splited.prefix.concat(splited.middlewares);
-        return super[method](...args);
-      };
-    });
+  #formatRouteParams(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc | ResourcesController,
+    middlewares: (MiddlewareFunc | string | ResourcesController)[]) {
+    const options: RegisterOptions = {};
+    let path: string | RegExp;
+    if (typeof pathOrMiddleware === 'string' || pathOrMiddleware instanceof RegExp) {
+      // verb(method, name, path, ...middlewares)
+      path = pathOrMiddleware;
+      assert(typeof nameOrPath === 'string', 'route name should be string');
+      options.name = nameOrPath;
+    } else {
+      // verb(method, path, ...middlewares)
+      path = nameOrPath;
+      middlewares = [ pathOrMiddleware, ...middlewares ];
+    }
+    return {
+      path,
+      middlewares,
+      options,
+    };
   }
 
-  /**
-   * Create and register a route.
-   * @param {String} path - url path
-   * @param {Array} methods - Array of HTTP verbs
-   * @param {Array} middlewares -
-   * @param {Object} opts -
-   * @return {Route} this
-   */
-  register(path, methods, middlewares, opts) {
-    // patch register to support generator function middleware and string controller
-    middlewares = Array.isArray(middlewares) ? middlewares : [ middlewares ];
-    middlewares = convertMiddlewares(middlewares, this.app);
-    path = Array.isArray(path) ? path : [ path ];
-    path.forEach(p => super.register(p, methods, middlewares, opts));
+  verb(method: RouterMethod | RouterMethod[], nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middleware: (MiddlewareFunc | string)[]) {
+    const { path, middlewares, options } = this.#formatRouteParams(nameOrPath, pathOrMiddleware, middleware);
+    if (typeof method === 'string') {
+      method = [ method ];
+    }
+    this.register(path, method, middlewares, options);
     return this;
+  }
+
+  // const METHODS = [ 'head', 'options', 'get', 'put', 'patch', 'post', 'delete', 'all' ];
+  head(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  head(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  head(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('head', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  options(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  options(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  options(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('options', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  get(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  get(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  get(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('get', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  put(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  put(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  put(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('put', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  patch(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  patch(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  patch(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('patch', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  post(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  post(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  post(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('post', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  delete(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  delete(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  delete(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb('delete', nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+  all(path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  all(name: string, path: string | RegExp, ...middlewares: (MiddlewareFunc | string)[]): Router;
+  all(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc,
+    ...middlewares: (MiddlewareFunc | string)[]): Router {
+    return this.verb(methods, nameOrPath, pathOrMiddleware, ...middlewares);
+  }
+
+  register(path: string | string[] | RegExp | RegExp[],
+    methods: string[],
+    middleware: MiddlewareFunc | string | (MiddlewareFunc | string | ResourcesController)[],
+    opts?: RegisterOptions) {
+    // patch register to support generator function middleware and string controller
+    middleware = Array.isArray(middleware) ? middleware : [ middleware ];
+    const middlewares = convertMiddlewares(middleware, this.app);
+    return super.register(path, methods, middlewares, opts);
   }
 
   /**
@@ -136,43 +207,34 @@ class EggRouter extends Router {
    * @return {Router} return route object.
    * @since 1.0.0
    */
-  resources(...args) {
-    const splited = spliteAndResolveRouterParams({ args, app: this.app });
-    const middlewares = splited.middlewares;
+  resources(prefix: string, controller: string | ResourcesController): Router;
+  resources(prefix: string, middleware: MiddlewareFunc, controller: string | ResourcesController): Router;
+  resources(name: string, prefix: string, controller: string | ResourcesController): Router;
+  resources(name: string, prefix: string, middleware: MiddlewareFunc, controller: string | ResourcesController): Router;
+  resources(nameOrPath: string | RegExp, pathOrMiddleware: string | RegExp | MiddlewareFunc | ResourcesController,
+    ...middleware: (MiddlewareFunc | string | ResourcesController)[]): Router {
+    const { path, middlewares, options } = this.#formatRouteParams(nameOrPath, pathOrMiddleware, middleware);
     // last argument is Controller object
-    const controller = splited.middlewares.pop();
-
-    let name = '';
-    let prefix = '';
-    if (splited.prefix.length === 2) {
-      // router.get('users', '/users')
-      name = splited.prefix[0];
-      prefix = splited.prefix[1];
-    } else {
-      // router.get('/users')
-      prefix = splited.prefix[0];
-    }
-
+    const controller = resolveController(middlewares.pop()!, this.app);
     for (const key in REST_MAP) {
-      const action = controller[key];
+      const action = controller[key] as MiddlewareFunc;
       if (!action) continue;
 
       const opts = REST_MAP[key];
-      let formatedName;
+      let routeName;
       if (opts.member) {
-        formatedName = inflection.singularize(name);
+        routeName = inflection.singularize(options.name ?? '');
       } else {
-        formatedName = inflection.pluralize(name);
+        routeName = inflection.pluralize(options.name ?? '');
       }
       if (opts.namePrefix) {
-        formatedName = opts.namePrefix + formatedName;
+        routeName = opts.namePrefix + routeName;
       }
-      prefix = prefix.replace(/\/$/, '');
-      const path = opts.suffix ? `${prefix}/${opts.suffix}` : prefix;
+      const prefix = (path as string).replace(/\/$/, '');
+      const urlPath = opts.suffix ? `${prefix}/${opts.suffix}` : prefix;
       const method = Array.isArray(opts.method) ? opts.method : [ opts.method ];
-      this.register(path, method, middlewares.concat(action), { name: formatedName });
+      this.register(urlPath, method, middlewares.concat(action), { name: routeName });
     }
-
     return this;
   }
 
@@ -189,23 +251,23 @@ class EggRouter extends Router {
    * @return {String} url by path name and query params.
    * @since 1.0.0
    */
-  url(name, params) {
+  url(name: string, params?: Record<string, string | number | (string | number)[]>): string {
     const route = this.route(name);
     if (!route) return '';
 
     const args = params;
     let url = route.path;
 
-    assert(!is.regExp(url), `Can't get the url for regExp ${url} for by name '${name}'`);
+    assert(!(url instanceof RegExp), `Can't get the url for regExp ${url} for by name '${name}'`);
 
     const queries = [];
     if (typeof args === 'object' && args !== null) {
-      const replacedParams = [];
-      url = url.replace(/:([a-zA-Z_]\w*)/g, function($0, key) {
-        if (utility.has(args, key)) {
+      const replacedParams: string[] = [];
+      url = url.replace(/:([a-zA-Z_]\w*)/g, ($0, key) => {
+        if (key in args) {
           const values = args[key];
           replacedParams.push(key);
-          return utility.encodeURIComponent(Array.isArray(values) ? values[0] : values);
+          return safeEncodeURIComponent(Array.isArray(values) ? String(values[0]) : String(values));
         }
         return $0;
       });
@@ -214,15 +276,14 @@ class EggRouter extends Router {
         if (replacedParams.includes(key)) {
           continue;
         }
-
         const values = args[key];
-        const encodedKey = utility.encodeURIComponent(key);
+        const encodedKey = safeEncodeURIComponent(key);
         if (Array.isArray(values)) {
           for (const val of values) {
-            queries.push(`${encodedKey}=${utility.encodeURIComponent(val)}`);
+            queries.push(`${encodedKey}=${safeEncodeURIComponent(String(val))}`);
           }
         } else {
-          queries.push(`${encodedKey}=${utility.encodeURIComponent(values)}`);
+          queries.push(`${encodedKey}=${safeEncodeURIComponent(String(values))}`);
         }
       }
     }
@@ -239,62 +300,33 @@ class EggRouter extends Router {
     return url;
   }
 
-  pathFor(name, params) {
+  /**
+   * @alias to url()
+   */
+  pathFor(name: string, params?: Record<string, string | number | (string | number)[]>) {
     return this.url(name, params);
   }
 }
 
 /**
- * 1. split (name, url, ...middleware, controller) to
- * {
- *   prefix: [name, url]
- *   middlewares [...middleware, controller]
- * }
- *
- * 2. resolve controller from string to function
- *
- * @param  {Object} options inputs
- * @param {Object} options.args router params
- * @param {Object} options.app egg application instance
- * @return {Object} prefix and middlewares
- */
-function spliteAndResolveRouterParams({ args, app }) {
-  let prefix;
-  let middlewares;
-  if (args.length >= 3 && (is.string(args[1]) || is.regExp(args[1]))) {
-    // app.get(name, url, [...middleware], controller)
-    prefix = args.slice(0, 2);
-    middlewares = args.slice(2);
-  } else {
-    // app.get(url, [...middleware], controller)
-    prefix = args.slice(0, 1);
-    middlewares = args.slice(1);
-  }
-  // resolve controller
-  const controller = middlewares.pop();
-  middlewares.push(resolveController(controller, app));
-  return { prefix, middlewares };
-}
-
-/**
  * resolve controller from string to function
- * @param  {String|Function} controller input controller
- * @param  {Application} app egg application instance
- * @return {Function} controller function
+ * @param {String|Function} controller input controller
+ * @param {Application} app egg application instance
  */
-function resolveController(controller, app) {
-  if (is.string(controller)) {
+function resolveController(controller: string | MiddlewareFunc | ResourcesController, app: Application) {
+  if (typeof controller === 'string') {
+    // resolveController('foo.bar.Home', app)
     const actions = controller.split('.');
     let obj = app.controller;
     actions.forEach(key => {
       obj = obj[key];
-      if (!obj) throw new Error(`controller '${controller}' not exists`);
+      if (!obj) throw new Error(`app.controller.${controller} not exists`);
     });
-    controller = obj;
+    controller = obj as any;
   }
   // ensure controller is exists
   if (!controller) throw new Error('controller not exists');
-  return controller;
+  return controller as any;
 }
 
 /**
@@ -309,17 +341,9 @@ function resolveController(controller, app) {
  *
  * @param  {Array} middlewares middlewares and controller(last middleware)
  * @param  {Application} app  egg application instance
- * @return {Array} middlewares
  */
-function convertMiddlewares(middlewares, app) {
+function convertMiddlewares(middlewares: (MiddlewareFunc | string | ResourcesController)[], app: Application) {
   // ensure controller is resolved
-  const controller = resolveController(middlewares.pop(), app);
-  // make middleware support generator function
-  middlewares = middlewares.map(utils.middleware);
-  const wrappedController = (ctx, next) => {
-    return utils.callFn(controller, [ ctx, next ], ctx);
-  };
-  return middlewares.concat([ wrappedController ]);
+  const controller = resolveController(middlewares.pop()!, app);
+  return [ ...middlewares as MiddlewareFunc[], controller ];
 }
-
-module.exports = EggRouter;
