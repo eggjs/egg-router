@@ -49,14 +49,14 @@ Create a new router.
 **Example**
 Basic usage:
 
-```javascript
-var Koa = require('koa');
-var Router = require('@eggjs/router');
+```ts
+import Koa from '@eggjs/koa';
+import Router from '@eggjs/router';
 
-var app = new Koa();
-var router = new Router();
+const app = new Koa();
+const router = new Router();
 
-router.get('/', (ctx, next) => {
+router.get('/', async (ctx, next) => {
   // ctx.router available
 });
 
@@ -77,7 +77,7 @@ where **verb** is one of the HTTP verbs such as `router.get()` or `router.post()
 
 Additionaly, `router.all()` can be used to match against all methods.
 
-```javascript
+```ts
 router
   .get('/', (ctx, next) => {
     ctx.body = 'Hello World!';
@@ -109,7 +109,7 @@ Query strings will not be considered when matching requests.
 Routes can optionally have names. This allows generation of URLs and easy
 renaming of URLs during development.
 
-```javascript
+```ts
 router.get('user', '/users/:id', (ctx, next) => {
  // ...
 });
@@ -122,7 +122,7 @@ router.url('user', 3);
 
 Multiple middleware may be given:
 
-```javascript
+```ts
 router.get(
   '/users/:id',
   (ctx, next) => {
@@ -142,9 +142,9 @@ router.get(
 
 Nesting routers is supported:
 
-```javascript
-var forums = new Router();
-var posts = new Router();
+```ts
+const forums = new Router();
+const posts = new Router();
 
 posts.get('/', (ctx, next) => {...});
 posts.get('/:pid', (ctx, next) => {...});
@@ -158,8 +158,8 @@ app.use(forums.routes());
 
 Route paths can be prefixed at the router level:
 
-```javascript
-var router = new Router({
+```ts
+const router = new Router({
   prefix: '/users'
 });
 
@@ -171,7 +171,7 @@ router.get('/:id', ...); // responds to "/users/:id"
 
 Named route parameters are captured and added to `ctx.params`.
 
-```javascript
+```ts
 router.get('/:category/:title', (ctx, next) => {
   console.log(ctx.params);
   // => { category: 'programming', title: 'how-to-node' }
@@ -215,7 +215,7 @@ sequentially, requests start at the first middleware and work their way
 
 **Example**
 
-```javascript
+```ts
 // session middleware will run before authorize
 router
   .use(session())
@@ -244,7 +244,7 @@ Set the path prefix for a Router instance that was already initialized.
 
 **Example**
 
-```javascript
+```ts
 router.prefix('/things/:thing_id')
 ```
 
@@ -267,12 +267,12 @@ with `405 Method Not Allowed` and `501 Not Implemented` as appropriate.
 
 **Example**
 
-```javascript
-var Koa = require('koa');
-var Router = require('egg-router');
+```ts
+import Koa from '@eggjs/koa';
+import Router from '@eggjs/router';
 
-var app = new Koa();
-var router = new Router();
+const app = new Koa();
+const router = new Router();
 
 app.use(router.routes());
 app.use(router.allowedMethods());
@@ -280,13 +280,13 @@ app.use(router.allowedMethods());
 
 **Example with [Boom](https://github.com/hapijs/boom)**
 
-```javascript
-var Koa = require('koa');
-var Router = require('egg-router');
-var Boom = require('boom');
+```ts
+import Koa from '@eggjs/koa';
+import Router from '@eggjs/router';
+import Boom from 'boom';
 
-var app = new Koa();
-var router = new Router();
+const app = new Koa();
+const router = new Router();
 
 app.use(router.routes());
 app.use(router.allowedMethods({
@@ -310,7 +310,7 @@ router.redirect('/login', 'sign-in');
 
 This is equivalent to:
 
-```javascript
+```ts
 router.all('/login', ctx => {
   ctx.redirect('/sign-in');
   ctx.status = 301;
@@ -354,7 +354,7 @@ Generate URL for route. Takes a route name and map of named `params`.
 
 **Example**
 
-```javascript
+```ts
 router.get('user', '/users/:id', (ctx, next) => {
   // ...
 });
@@ -393,7 +393,7 @@ validation.
 
 **Example**
 
-```javascript
+```ts
 router
   .param('user', (id, ctx, next) => {
     ctx.user = users[id];
@@ -429,8 +429,8 @@ Generate URL from url pattern and given `params`.
 
 **Example**
 
-```javascript
-var url = Router.url('/users/:id', {id: 1});
+```ts
+const url = Router.url('/users/:id', {id: 1});
 // => "/users/1"
 
 const url = Router.url('/users/:id', {id: 1}, {query: { active: true }});
