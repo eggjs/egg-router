@@ -1,5 +1,11 @@
 # @eggjs/router
 
+[![NPM version](https://img.shields.io/npm/v/@eggjs/router.svg?style=flat-square)](https://npmjs.org/package/@eggjs/router)
+[![NPM download](https://img.shields.io/npm/dm/@eggjs/router.svg?style=flat-square)](https://npmjs.org/package/@eggjs/router)
+[![Node.js CI](https://github.com/eggjs/egg-router/actions/workflows/nodejs.yml/badge.svg?branch=master)](https://github.com/eggjs/egg-router/actions/workflows/nodejs.yml)
+[![Test coverage](https://img.shields.io/codecov/c/github/eggjs/egg-router.svg?style=flat-square)](https://codecov.io/gh/eggjs/egg-router)
+[![Known Vulnerabilities](https://snyk.io/test/npm/@eggjs/router/badge.svg?style=flat-square)](https://snyk.io/test/npm/@eggjs/router)
+
 Router core component for [Egg.js](https://github.com/eggjs).
 
 > **This repository is a fork of [koa-router](https://github.com/alexmingoia/koa-router).** with some additional features.
