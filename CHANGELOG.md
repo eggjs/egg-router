@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/eggjs/egg-router/compare/v3.0.0...v3.0.1) (2024-06-15)
+
+
+### Bug Fixes
+
+* export types like ResourcesController ([#11](https://github.com/eggjs/egg-router/issues/11)) ([83d3309](https://github.com/eggjs/egg-router/commit/83d3309f7434bbd9a5f85efc5b52fa34dd0fe81d))
+
 ## [3.0.0](https://github.com/eggjs/egg-router/compare/v2.0.1...v3.0.0) (2024-06-11)
 
 
