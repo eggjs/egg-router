@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/eggjs/egg-router/compare/v3.0.1...v3.0.2) (2024-06-16)
+
+
+### Bug Fixes
+
+* support router.verb(method, path, controllerString) ([#12](https://github.com/eggjs/egg-router/issues/12)) ([34cea74](https://github.com/eggjs/egg-router/commit/34cea74a52a6651b5a5b30c4b2aee1c0776477a2))
+
 ## [3.0.1](https://github.com/eggjs/egg-router/compare/v3.0.0...v3.0.1) (2024-06-15)
 
 
