@@ -1,6 +1,6 @@
 {
   "name": "@eggjs/router",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "engines": {
     "node": ">= 18.19.0"
   },

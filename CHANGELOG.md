@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.5](https://github.com/eggjs/egg-router/compare/v3.0.4...v3.0.5) (2024-06-16)
+
+
+### Bug Fixes
+
+* should support urls with controller string ([#15](https://github.com/eggjs/egg-router/issues/15)) ([b645095](https://github.com/eggjs/egg-router/commit/b6450955716eb7d965c357058cf5b93f9e49353f))
+
 ## [3.0.4](https://github.com/eggjs/egg-router/compare/v3.0.3...v3.0.4) (2024-06-16)
 
 
