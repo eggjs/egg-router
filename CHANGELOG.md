@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.4](https://github.com/eggjs/egg-router/compare/v3.0.3...v3.0.4) (2024-06-16)
+
+
+### Bug Fixes
+
+* should bind ctx to egg router controller this context ([#14](https://github.com/eggjs/egg-router/issues/14)) ([b5b5588](https://github.com/eggjs/egg-router/commit/b5b55887b90e77f2f19033c814b604301a6308e2))
+
 ## [3.0.3](https://github.com/eggjs/egg-router/compare/v3.0.2...v3.0.3) (2024-06-16)
 
 
