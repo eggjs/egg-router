@@ -1,8 +1,27 @@
 import { strict as assert } from 'node:assert';
 import is from 'is-type-of';
+import Koa from '@eggjs/koa';
+import request from 'supertest';
 import { EggRouter } from '../src/index.js';
 
 describe('test/EggRouter.test.ts', () => {
+  it('auto bind ctx to this on controller', async () => {
+    const app = new Koa();
+    const router = new EggRouter({}, app as any);
+    router.get('home', '/', function(this: any) {
+      this.body = {
+        url: this.router.url('home'),
+        method: this.method,
+      };
+    });
+    app.use(router.routes());
+    const res = await request(app.callback())
+      .get('/')
+      .expect(200);
+    assert.equal(res.body.url, '/');
+    assert.equal(res.body.method, 'GET');
+  });
+
   it('creates new router with egg app', () => {
     const app = { controller: {} };
     const router = new EggRouter({}, app);

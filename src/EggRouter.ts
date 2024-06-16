@@ -2,8 +2,9 @@ import assert from 'node:assert';
 import { encodeURIComponent as safeEncodeURIComponent } from 'utility';
 import inflection from 'inflection';
 import methods from 'methods';
+import { isGeneratorFunction } from 'is-type-of';
 import { RegisterOptions, Router, RouterMethod, RouterOptions } from './Router.js';
-import { MiddlewareFunc, ResourcesController } from './types.js';
+import { MiddlewareFunc, Next, ResourcesController } from './types.js';
 
 interface RestfulOptions {
   suffix?: string;
@@ -146,8 +147,15 @@ export class EggRouter extends Router {
     methods: string[],
     middleware: MiddlewareFunc | string | (MiddlewareFunc | string | ResourcesController)[],
     opts?: RegisterOptions) {
-    // patch register to support generator function middleware and string controller
+    // patch register to support bind ctx function middleware and string controller
     middleware = Array.isArray(middleware) ? middleware : [ middleware ];
+    for (const mw of middleware) {
+      if (isGeneratorFunction(mw)) {
+        throw new TypeError(
+          methods.toString() + ' `' + path + '`: Please use async function instead of generator function',
+        );
+      }
+    }
     const middlewares = convertMiddlewares(middleware, this.app);
     return super.register(path, methods, middlewares, opts);
   }
@@ -326,7 +334,7 @@ function resolveController(controller: string | MiddlewareFunc | ResourcesContro
  * - [name, url(regexp), controller]: app.get('regRouter', /\/home\/index/, 'home.index');
  * - [name, url, middleware, [...], controller]: `app.get(/user/:id', hasLogin, canGetUser, 'user.show');`
  *
- * 2. make middleware support generator function
+ * 2. bind ctx to controller `this`
  *
  * @param  {Array} middlewares middlewares and controller(last middleware)
  * @param  {Application} app  egg application instance
@@ -334,5 +342,8 @@ function resolveController(controller: string | MiddlewareFunc | ResourcesContro
 function convertMiddlewares(middlewares: (MiddlewareFunc | string | ResourcesController)[], app: Application) {
   // ensure controller is resolved
   const controller = resolveController(middlewares.pop()!, app);
-  return [ ...middlewares as MiddlewareFunc[], controller ];
+  function wrappedController(ctx: any, next: Next) {
+    return controller.apply(ctx, [ ctx, next ]);
+  }
+  return [ ...middlewares as MiddlewareFunc[], wrappedController ];
 }
