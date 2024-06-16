@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.3](https://github.com/eggjs/egg-router/compare/v3.0.2...v3.0.3) (2024-06-16)
+
+
+### Bug Fixes
+
+* debug keyword use package.name + filename ([#13](https://github.com/eggjs/egg-router/issues/13)) ([3882819](https://github.com/eggjs/egg-router/commit/38828192d453234fe93bf4f23e1f1271645e4c85))
+
 ## [3.0.2](https://github.com/eggjs/egg-router/compare/v3.0.1...v3.0.2) (2024-06-16)
 
 
