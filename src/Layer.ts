@@ -9,7 +9,7 @@ import type {
   ParamMiddlewareFunc,
 } from './types.js';
 
-const debug = debuglog('egg-router:layer');
+const debug = debuglog('@eggjs/router:Layer');
 
 export interface LayerOptions {
   prefix?: string;

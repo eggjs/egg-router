@@ -10,7 +10,7 @@ import methods from 'methods';
 import { Layer, LayerURLOptions } from './Layer.js';
 import { MiddlewareFunc, MiddlewareFuncWithRouter, Next, ParamMiddlewareFunc, ResourcesController } from './types.js';
 
-const debug = debuglog('egg-router:router');
+const debug = debuglog('@eggjs/router:Router');
 
 export type RouterMethod = typeof methods[0];
 
