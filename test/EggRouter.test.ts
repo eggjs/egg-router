@@ -135,6 +135,63 @@ describe('test/EggRouter.test.ts', () => {
     assert(router.stack[1].stack.length === 1);
   });
 
+  it('should app.verb(url, controllerString) work', () => {
+    const app = {
+      controller: {
+        async foo() { return; },
+        hello: {
+          world() { return; },
+        },
+      },
+    };
+
+    const router = new EggRouter({}, app);
+    router.get('/foo', 'foo');
+    router.post('/hello/world', 'hello.world');
+
+    assert.equal(router.stack[0].name, 'foo');
+    assert.equal(router.stack[0].path, '/foo');
+    assert.deepEqual(router.stack[0].methods, [ 'HEAD', 'GET' ]);
+    assert.equal(router.stack[0].stack.length, 1);
+    assert.equal(router.stack[1].name, 'hello.world');
+    assert.equal(router.stack[1].path, '/hello/world');
+    assert.deepEqual(router.stack[1].methods, [ 'POST' ]);
+    assert.equal(router.stack[1].stack.length, 1);
+  });
+
+  it('should app.verb(urlRegex, controllerString) work', () => {
+    const app = {
+      controller: {
+        async foo() { return; },
+        hello: {
+          world() { return; },
+        },
+      },
+    };
+
+    const router = new EggRouter({}, app);
+    router.get(/^\/foo/, 'foo');
+    router.post(/^\/hello\/world/, 'hello.world');
+    router.post(/^\/hello\/world2/, () => {}, 'hello.world');
+
+    assert.equal(router.stack[0].name, 'foo');
+    assert(router.stack[0].path instanceof RegExp);
+    assert.equal(router.stack[0].path.toString(), String(/^\/foo/));
+    assert.deepEqual(router.stack[0].methods, [ 'HEAD', 'GET' ]);
+    assert.equal(router.stack[0].stack.length, 1);
+    assert.equal(router.stack[1].name, 'hello.world');
+    assert(router.stack[1].path instanceof RegExp);
+    assert.equal(router.stack[1].path.toString(), String(/^\/hello\/world/));
+    assert.deepEqual(router.stack[1].methods, [ 'POST' ]);
+    assert.equal(router.stack[1].stack.length, 1);
+
+    assert.equal(router.stack[2].name, undefined);
+    assert(router.stack[2].path instanceof RegExp);
+    assert.equal(router.stack[2].path.toString(), String(/^\/hello\/world2/));
+    assert.deepEqual(router.stack[2].methods, [ 'POST' ]);
+    assert.equal(router.stack[2].stack.length, 2);
+  });
+
   it('should app.verb() throw if not found controller', () => {
     const app = {
       controller: {
