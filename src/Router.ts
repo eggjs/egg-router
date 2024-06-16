@@ -601,7 +601,25 @@ export class Router {
     middlewares: (MiddlewareFunc | string | ResourcesController)[]) {
     const options: RegisterOptions = {};
     let path: string | RegExp | (string | RegExp)[];
-    if (typeof pathOrMiddleware === 'string' || pathOrMiddleware instanceof RegExp) {
+    if (typeof nameOrPath === 'string' && nameOrPath.startsWith('/')) {
+      // verb(method, path, ...middlewares)
+      path = nameOrPath;
+      middlewares = [ pathOrMiddleware as string, ...middlewares ];
+      if (typeof pathOrMiddleware === 'string') {
+        // verb(method, path, controllerString)
+        // set controller name to router name
+        options.name = pathOrMiddleware;
+      }
+    } else if (nameOrPath instanceof RegExp) {
+      // verb(method, pathRegex, ...middlewares)
+      path = nameOrPath;
+      middlewares = [ pathOrMiddleware as string, ...middlewares ];
+      if (typeof pathOrMiddleware === 'string') {
+        // verb(method, pathRegex, controllerString)
+        // set controller name to router name
+        options.name = pathOrMiddleware;
+      }
+    } else if (typeof pathOrMiddleware === 'string' || pathOrMiddleware instanceof RegExp) {
       // verb(method, name, path, ...middlewares)
       path = pathOrMiddleware;
       assert(typeof nameOrPath === 'string', 'route name should be string');

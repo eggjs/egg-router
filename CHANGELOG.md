@@ -12,10 +12,10 @@
 
 ### ⚠ BREAKING CHANGES
 
-* drop Node.js < 18.7.0 support
+* drop Node.js < 18.19.0 support
 
 - Drop generator function support
-- Drop Node.js < 18.7.0 support
+- Drop Node.js < 18.19.0 support
 
 <!-- This is an auto-generated comment: release notes by coderabbit.ai
 -->
