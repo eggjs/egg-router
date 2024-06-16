@@ -178,6 +178,44 @@ describe('test/EggRouter.test.ts', () => {
     assert.equal(router.stack[1].stack.length, 1);
   });
 
+  it('should app.verb(urls, controllerString) work', () => {
+    const app = {
+      controller: {
+        async foo() { return; },
+        hello: {
+          world() { return; },
+        },
+      },
+    };
+
+    const router = new EggRouter({}, app);
+    router.get([ '/foo', '/bar' ], 'foo');
+    router.post('/hello/world', 'hello.world');
+    router.put('other', [ '/other1', '/other2' ], 'foo');
+
+    assert.equal(router.stack[0].name, 'foo');
+    assert.equal(router.stack[0].path, '/foo');
+    assert.deepEqual(router.stack[0].methods, [ 'HEAD', 'GET' ]);
+    assert.equal(router.stack[0].stack.length, 1);
+    assert.equal(router.stack[1].name, 'foo');
+    assert.equal(router.stack[1].path, '/bar');
+    assert.deepEqual(router.stack[1].methods, [ 'HEAD', 'GET' ]);
+    assert.equal(router.stack[1].stack.length, 1);
+    assert.equal(router.stack[2].name, 'hello.world');
+    assert.equal(router.stack[2].path, '/hello/world');
+    assert.deepEqual(router.stack[2].methods, [ 'POST' ]);
+    assert.equal(router.stack[2].stack.length, 1);
+
+    assert.equal(router.stack[3].name, 'other');
+    assert.equal(router.stack[3].path, '/other1');
+    assert.deepEqual(router.stack[3].methods, [ 'PUT' ]);
+    assert.equal(router.stack[3].stack.length, 1);
+    assert.equal(router.stack[4].name, 'other');
+    assert.equal(router.stack[4].path, '/other2');
+    assert.deepEqual(router.stack[4].methods, [ 'PUT' ]);
+    assert.equal(router.stack[4].stack.length, 1);
+  });
+
   it('should app.verb(urlRegex, controllerString) work', () => {
     const app = {
       controller: {

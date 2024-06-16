@@ -619,6 +619,15 @@ export class Router {
         // set controller name to router name
         options.name = pathOrMiddleware;
       }
+    } else if (Array.isArray(nameOrPath)) {
+      // verb(method, paths, ...middlewares)
+      path = nameOrPath;
+      middlewares = [ pathOrMiddleware as string, ...middlewares ];
+      if (typeof pathOrMiddleware === 'string') {
+        // verb(method, pathRegex, controllerString)
+        // set controller name to router name
+        options.name = pathOrMiddleware;
+      }
     } else if (typeof pathOrMiddleware === 'string' || pathOrMiddleware instanceof RegExp) {
       // verb(method, name, path, ...middlewares)
       path = pathOrMiddleware;
