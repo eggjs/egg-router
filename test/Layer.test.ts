@@ -1,5 +1,5 @@
 import { strict as assert } from 'node:assert';
-import Application from '@eggjs/koa';
+import { Application } from '@eggjs/koa';
 import request from 'supertest';
 import { Router } from '../src/Router.js';
 import { Layer } from '../src/Layer.js';

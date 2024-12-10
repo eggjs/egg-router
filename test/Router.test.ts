@@ -1,6 +1,6 @@
 import { strict as assert } from 'node:assert';
 import fs from 'node:fs';
-import Koa from '@eggjs/koa';
+import { Application as Koa } from '@eggjs/koa';
 import methods from 'methods';
 import request from 'supertest';
 import Router from '../src/index.js';

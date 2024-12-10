@@ -1,12 +1,12 @@
 import { strict as assert } from 'node:assert';
 import is from 'is-type-of';
-import Koa from '@eggjs/koa';
+import { Application } from '@eggjs/koa';
 import request from 'supertest';
 import { EggRouter } from '../src/index.js';
 
 describe('test/EggRouter.test.ts', () => {
   it('auto bind ctx to this on controller', async () => {
-    const app = new Koa();
+    const app = new Application();
     const router = new EggRouter({}, app as any);
     router.get('home', '/', function(this: any) {
       this.body = {
